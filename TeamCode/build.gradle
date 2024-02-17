@@ -10,6 +10,9 @@
 
 
 // Custom definitions may go here
+plugins {
+    id 'kotlin-android'
+}
 
 // Include common definitions from above.
 apply from: '../build.common.gradle'
@@ -24,6 +27,12 @@ android {
 }
 
 dependencies {
+    implementation 'androidx.core:core-ktx:1.5.0'
+    implementation "org.jetbrains.kotlin:kotlin-stdlib:1.9.22"
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.3.9")
+
     implementation project(':FtcRobotController')
+    implementation project(':Hyperion')
+
     annotationProcessor files('lib/OpModeAnnotationProcessor.jar')
 }
