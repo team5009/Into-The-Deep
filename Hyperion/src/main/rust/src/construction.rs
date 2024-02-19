@@ -1,4 +1,4 @@
-use std::vec;
+use std::{f64::consts::PI, vec};
 
 use crate::{Command, CommandState, Event, Point, Spline, Wait, WaitType};
 use serde_json::{json, Value};
@@ -44,7 +44,8 @@ pub fn command_read(content: String) -> Result<Value, ()> {
 
                 let event = Event::new(event_call);
 
-                let point = Point::new_from_vec(args, event);
+                let mut point = Point::new_from_vec(args, event);
+                point.rot *= PI / 180.0;
 
                 commands.push(Command::Start(point));
 
@@ -106,7 +107,8 @@ pub fn command_read(content: String) -> Result<Value, ()> {
 
                 let event = Event::new(event_call);
 
-                let point = Point::new_from_vec(args, event);
+                let mut point = Point::new_from_vec(args, event);
+                point.rot *= PI / 180.0;
 
                 commands.push(Command::Line(point));
             }
@@ -145,7 +147,8 @@ pub fn command_read(content: String) -> Result<Value, ()> {
 
                 let event = Event::new(event_call);
 
-                let point = Point::new_from_vec(args, event);
+                let mut point = Point::new_from_vec(args, event);
+                point.rot *= PI / 180.0;
 
                 match spline_state {
                     CommandState::Start => match commands.last_mut().unwrap() {
@@ -200,7 +203,8 @@ pub fn command_read(content: String) -> Result<Value, ()> {
 
                 let event = Event::new(event_call);
 
-                let point = Point::new_from_vec(args, event);
+                let mut point = Point::new_from_vec(args, event);
+                point.rot *= PI / 180.0;
 
                 match spline_state {
                     CommandState::Start => {

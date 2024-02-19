@@ -40,7 +40,6 @@ class ProportionalController(var gain: Double, var accelLimit: Double, var defau
 			while (error <= -180) error += 360.0
 		}
 		inPosition = abs(error) < tolerance
-
 		// Prevent any very slow motor output accumulation
 		if (abs(error) <= deadband) {
 			output = 0.0
@@ -49,10 +48,12 @@ class ProportionalController(var gain: Double, var accelLimit: Double, var defau
 			output = error * gain
 
 			// Now limit rate of change of output (acceleration)
-			if (output - lastOutput > dV) {
-				output = lastOutput + dV
-			} else if (output - lastOutput < -dV) {
-				output = lastOutput - dV
+			if (abs(output) > abs(lastOutput)) {
+				if (output - lastOutput > dV) {
+					output = lastOutput + dV
+				} else if (output - lastOutput < -dV) {
+					output = lastOutput - dV
+				}
 			}
 		}
 		lastOutput = output

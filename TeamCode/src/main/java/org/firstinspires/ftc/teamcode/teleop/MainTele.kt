@@ -16,7 +16,7 @@ class MainTele: LinearOpMode(){
 	override fun runOpMode() {
 		val instance = MainTeleOp(this)
 		val dashboard = FtcDashboard.getInstance()
-		val odometry = Odometry(instance.bot.leftEncoder, instance.bot.rightEncoder, instance.bot.backEncoder)
+
 		telemetry = MultipleTelemetry(telemetry, dashboard.telemetry)
 
 		waitForStart()
@@ -34,10 +34,10 @@ class MainTele: LinearOpMode(){
 		}
 
 		while(opModeIsActive()) {
-			odometry.calculate()
-			telemetry.addData("X", odometry.location.x)
-			telemetry.addData("Y", odometry.location.y)
-			telemetry.addData("Heading", odometry.getRotDegrees())
+			instance.odometry.calculate()
+			telemetry.addData("X", instance.odometry.location.x)
+			telemetry.addData("Y", instance.odometry.location.y)
+			telemetry.addData("Heading", instance.odometry.getRotDegrees())
 			telemetry.update()
 		}
 

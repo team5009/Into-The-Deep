@@ -1,4 +1,4 @@
-use std::fmt;
+use std::{f64::consts::PI, fmt};
 
 use construction::command_read;
 use jni::{
@@ -53,6 +53,10 @@ impl Point {
             rot: vec[2],
             event,
         }
+    }
+
+    fn deg_to_rad(&mut self) {
+        self.rot *= 180.0 / PI
     }
 }
 

@@ -1,5 +1,6 @@
 package ca.helios5009.hyperion.core
 
+import ca.helios5009.hyperion.core.Movement
 import ca.helios5009.hyperion.misc.events.EventListener
 import ca.helios5009.hyperion.misc.commands.Bezier
 import ca.helios5009.hyperion.misc.commands.EventCall
@@ -22,7 +23,7 @@ class CommandExecute(val opMode: LinearOpMode, val eventListener: EventListener,
 
 	fun readPath(fileName: String) {
 		val pathReader = AutonPaths()
-		val pathSegment = pathReader.readPath("$fileName.csv")
+		val pathSegment = pathReader.readPath(fileName)
 		unParsedCommands = commandsParse.read(pathSegment)
 	}
 

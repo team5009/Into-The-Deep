@@ -6,12 +6,14 @@ import kotlin.math.PI
 import kotlin.math.cos
 import kotlin.math.sin
 
+
+
 class Odometry (private val leftEncoder: DcMotorEx, private val rightEncoder: DcMotorEx, private val backEncoder: DcMotorEx) {
 
 	var location = Point(0.0, 0.0, 0.0)
 
-	private val distanceLeftRight: Double = 11.5652
-	private val distanceBack: Double = 6.5
+	private var distanceLeftRight = 0.0
+	private var distanceBack = 0.0
 	private val encoderConstant: Double = PI * 2.0 / 2000.0
 
 	private var currentLeft = 0.0
@@ -22,6 +24,10 @@ class Odometry (private val leftEncoder: DcMotorEx, private val rightEncoder: Dc
 	private var lastRight = 0.0
 	private var lastBack = 0.0
 
+	fun setConstants(distanceBack: Double, distanceLeftRight: Double) {
+		this.distanceBack = distanceBack
+		this.distanceLeftRight = distanceLeftRight
+	}
 
 	fun calculate(): Boolean {
 		lastBack = currentBack
@@ -41,15 +47,15 @@ class Odometry (private val leftEncoder: DcMotorEx, private val rightEncoder: Dc
 		val deltaY = deltaBack * encoderConstant - distanceBack * deltaTheta
 
 		val theta = location.rot + deltaTheta
-		location.x += deltaX * cos(theta) - deltaY * sin(theta)
-		location.y -= deltaX * sin(theta) + deltaY * cos(theta)
+		location.x += deltaX * cos(theta) + deltaY * sin(theta)
+		location.y += deltaX * sin(theta) - deltaY * cos(theta)
 		location.rot += deltaTheta
 
 		return true
 	}
 
 	fun getRotDegrees() : Double {
-		return location.rot / 2.0 / PI / distanceBack * 360
+		return location.rot * 180 / (PI)
 	}
 
 	fun setOrigin (x:Double, y: Double, rot: Double) {
