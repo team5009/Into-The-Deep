@@ -6,7 +6,6 @@ import ca.helios5009.hyperion.misc.lerp
 import com.qualcomm.robotcore.util.RobotLog
 import kotlin.math.pow
 
-//@SuppressLint("UnsafeDynamicallyLoadedCode")
 class CommandsParse {
 	init {
 		RobotLog.vv("Hyperion", "Loading Hyperion Library")

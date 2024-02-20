@@ -14,6 +14,8 @@ pub fn command_read(content: String) -> Result<Value, ()> {
     let content = content.lines();
     let mut execution_state = CommandState::Start;
     let mut spline_state = CommandState::None;
+    let mut block_state = CommandState::None;
+
 
     for (i, line) in content.clone().enumerate() {
         let mut line = line.split(',').collect::<Vec<&str>>();
@@ -110,7 +112,19 @@ pub fn command_read(content: String) -> Result<Value, ()> {
                 let mut point = Point::new_from_vec(args, event);
                 point.rot *= PI / 180.0;
 
-                commands.push(Command::Line(point));
+                match block_state {
+                    CommandState::Reading => match commands.last_mut().unwrap() {
+                        Command::Block(block) => {
+                            block.push(Command::Line(point));
+                        }
+                        _ => {
+                            panic!("{}Unable to add line to command list", ERR);
+                        }
+                    },
+                    _ => {
+                        commands.push(Command::Line(point));
+                    }
+                }
             }
             "spline" => {
                 if execution_state != CommandState::Reading {
@@ -233,6 +247,27 @@ pub fn command_read(content: String) -> Result<Value, ()> {
                     }
                     _ => {
                         panic!("{}Unable to add control", ERR);
+                    }
+                }
+            }
+            "block" => {
+                if execution_state != CommandState::Reading {
+                    panic!("{}No start command", ERR);
+                }
+                if spline_state != CommandState::None {
+                    panic!("{}Can't add block to Spline", ERR);
+                }
+
+                match block_state {
+                    CommandState::None => {
+                        commands.push(Command::Block(vec![]));
+                        block_state = CommandState::Reading;
+                    }
+                    CommandState::Reading => {
+                        block_state = CommandState::None;
+                    }
+                    _ => {
+                        panic!("{}Unable to add block to command list", ERR);
                     }
                 }
             }

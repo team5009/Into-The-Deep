@@ -23,7 +23,7 @@ class BlueRight: LinearOpMode() {
 		pathExecutor.readPath("blueLeft")
 		pathExecutor.motors = Motors( bot.fl, bot.fr, bot.bl, bot.br )
 		pathExecutor.odometry = Odometry(bot.leftEncoder, bot.rightEncoder, bot.backEncoder)
-		pathExecutor.movement = Movement(listener, pathExecutor.motors!!, pathExecutor.odometry!!)
+		pathExecutor.movement = Movement(listener, pathExecutor.motors!!, pathExecutor.odometry!!, this)
 
 		listener.Subscribe(OutTakePixel())
 		listener.Subscribe(ScoreYellowPixel())

@@ -2,6 +2,8 @@ import com.android.build.gradle.tasks.MergeSourceSetFolders
 import com.nishtahir.CargoBuildTask
 import com.nishtahir.CargoExtension
 
+val ftcVersion = "9.1.0"
+
 plugins {
 	id("com.android.library")
 	id("org.jetbrains.kotlin.android")
@@ -49,9 +51,10 @@ android {
 }
 
 dependencies {
-	compileOnly("org.firstinspires.ftc:RobotCore:9.1.0")
-	compileOnly("org.firstinspires.ftc:Hardware:9.1.0")
-	compileOnly("org.firstinspires.ftc:FtcCommon:9.1.0")
+	compileOnly("org.firstinspires.ftc:RobotCore:$ftcVersion")
+	compileOnly("org.firstinspires.ftc:Hardware:$ftcVersion")
+	compileOnly("org.firstinspires.ftc:FtcCommon:$ftcVersion")
+	compileOnly("org.firstinspires.ftc:Vision:$ftcVersion")
 
 	implementation("androidx.core:core-ktx:1.5.0")
 	implementation(platform("org.jetbrains.kotlin:kotlin-bom:1.6.10"))

@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode.autonomous
 
+import ca.helios5009.Hyperion.misc.Camera
+import ca.helios5009.Hyperion.misc.Position
 import ca.helios5009.hyperion.core.AutonPaths
 import ca.helios5009.hyperion.core.CommandExecute
 import ca.helios5009.hyperion.core.Movement
@@ -10,16 +12,24 @@ import com.acmerobotics.dashboard.telemetry.MultipleTelemetry
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode
 import org.firstinspires.ftc.teamcode.instances.autonomous.MainAutonomous
+import org.firstinspires.ftc.teamcode.misc.MenuPathSelector
+import org.firstinspires.ftc.teamcode.processors.BlueColorProcessor
+import org.firstinspires.ftc.teamcode.processors.ColorProcessor
+import org.firstinspires.ftc.teamcode.processors.RedColorProcessor
 
-@Autonomous(name = "PathTest", group = "Testing")
-class PathTest: LinearOpMode() {
+@Autonomous(name = "Main", group = "_Production")
+class MainAuto: LinearOpMode() {
 	private val listener = EventListener()
 	override fun runOpMode() {
 		val autonPaths = AutonPaths()
 		val instance = MainAutonomous(this, listener)
 		val dash = FtcDashboard.getInstance()
+		val Menu = MenuPathSelector()
+		var cam: Camera? = null
+		var camProcess: ColorProcessor? = null
+		var position = Position.NONE
 		telemetry = MultipleTelemetry(telemetry, dash.telemetry)
-		val pathExecutor = CommandExecute(this, listener, true)
+		val pathExecutor = CommandExecute(this, listener)
 		pathExecutor.motors = instance.motors
 		pathExecutor.odometry = instance.odometry
 		val movementClass = Movement(listener, pathExecutor.motors!!, pathExecutor.odometry!!, this)
@@ -29,67 +39,37 @@ class PathTest: LinearOpMode() {
 			doubleArrayOf(RotateConstants.GainSpeed, RotateConstants.AccelerationLimit, RotateConstants.DefaultOutputLimit, RotateConstants.Tolerance, RotateConstants.Deadband)
 		)
 		pathExecutor.movement = movementClass
-		var seletectedPath = 0
-		var gamepadDownPressed = false
-		var gamepadUpPressed = false
+		var cameraSetup = false
+
 		while (opModeInInit()) {
-			val storedPaths = autonPaths.getAllPaths()
-			if (gamepad1.dpad_up && !gamepadUpPressed) {
-				if (seletectedPath == storedPaths.size - 1) {
-					seletectedPath = 0
-				} else {
-					seletectedPath++
-				}
-				gamepadUpPressed = true
-			} else if (!gamepad1.dpad_up && gamepadUpPressed) {
-				gamepadUpPressed = false
-			} else if (gamepad1.dpad_down && !gamepadDownPressed) {
-				if (seletectedPath == 0) {
-					seletectedPath = storedPaths.size - 1
-				} else {
-					seletectedPath--
-				}
-				gamepadDownPressed = true
-			} else if (!gamepad1.dpad_down && gamepadDownPressed) {
-				gamepadDownPressed = false
+			Menu.run(this)
+			if (Menu.ready && !cameraSetup) {
+				cam = Camera(hardwareMap)
+				camProcess = ColorProcessor(Menu.allianceOption)
+				cam.addProcessor(camProcess)
+				cam.build()
+				cameraSetup = true
+			} else if (!Menu.ready && cameraSetup) {
+				cameraSetup = false
+				cam = null
+				camProcess = null
 			}
 
-			telemetry.addData("Selected Path", storedPaths[seletectedPath])
-			telemetry.update()
+			if (cameraSetup) {
+				position = camProcess!!.position
+			}
+			val storedPaths = autonPaths.getAllPaths()
 		}
 
 		waitForStart()
 
 		if (opModeIsActive()) {
-			pathExecutor.readPath(autonPaths.getAllPaths()[seletectedPath])
+//			pathExecutor.readPath(autonPaths.getAllPaths()[seletectedPath])
 			pathExecutor.execute()
 		}
 	}
 }
 
-@Config
-object DriveConstants {
-	@JvmField var GainSpeed = 0.05
-	@JvmField var AccelerationLimit = 1.0
-	@JvmField var DefaultOutputLimit = 0.8
-	@JvmField var Tolerance = 1.0
-	@JvmField var Deadband = 0.75
-}
-
-@Config
-object StrafeConstants {
-	@JvmField var GainSpeed = 0.1
-	@JvmField var AccelerationLimit = 1.5
-	@JvmField var DefaultOutputLimit = 1.0
-	@JvmField var Tolerance = 1.0
-	@JvmField var Deadband = 0.75
-}
-
-@Config
-object RotateConstants {
-	@JvmField var GainSpeed = 0.01
-	@JvmField var AccelerationLimit = 1.0
-	@JvmField var DefaultOutputLimit = 1.0
-	@JvmField var Tolerance = 4.0
-	@JvmField var Deadband = 1.0
+enum class Alliance {
+	RED, BLUE
 }

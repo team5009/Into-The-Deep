@@ -117,6 +117,7 @@ pub enum Command {
     Bezier(Bezier),
     Spline(Vec<Spline>),
     Wait(Wait),
+    Block(Vec<Command>),
 }
 
 #[derive(Serialize, Deserialize, PartialEq)]

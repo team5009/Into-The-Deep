@@ -2,6 +2,7 @@ package ca.helios5009.hyperion.core
 
 import ca.helios5009.hyperion.misc.commands.Point
 import com.qualcomm.robotcore.hardware.DcMotorEx
+import java.util.concurrent.atomic.AtomicReference
 import kotlin.math.PI
 import kotlin.math.cos
 import kotlin.math.sin
@@ -10,7 +11,7 @@ import kotlin.math.sin
 
 class Odometry (private val leftEncoder: DcMotorEx, private val rightEncoder: DcMotorEx, private val backEncoder: DcMotorEx) {
 
-	var location = Point(0.0, 0.0, 0.0)
+	var location = AtomicReference(Point(0.0, 0.0, 0.0))
 
 	private var distanceLeftRight = 0.0
 	private var distanceBack = 0.0
@@ -46,20 +47,26 @@ class Odometry (private val leftEncoder: DcMotorEx, private val rightEncoder: Dc
 		val deltaX = ((deltaLeft + deltaRight) / 2.0) * encoderConstant
 		val deltaY = deltaBack * encoderConstant - distanceBack * deltaTheta
 
-		val theta = location.rot + deltaTheta
-		location.x += deltaX * cos(theta) + deltaY * sin(theta)
-		location.y += deltaX * sin(theta) - deltaY * cos(theta)
-		location.rot += deltaTheta
+		val current = location.get()
+		val theta = current.rot + deltaTheta
+		current.x += deltaX * cos(theta) + deltaY * sin(theta)
+		current.y += deltaX * sin(theta) - deltaY * cos(theta)
+		current.rot += deltaTheta
+		location.set(current)
 
 		return true
 	}
 
 	fun getRotDegrees() : Double {
-		return location.rot * 180 / (PI)
+		return location.get().rot * 180 / (PI)
 	}
 
 	fun setOrigin (x:Double, y: Double, rot: Double) {
-		location = Point(x, y, rot)
+		location.set(Point(x, y, rot))
+	}
+
+	fun getLocation() : Point {
+		return location.get()
 	}
 
 }

@@ -5,7 +5,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.util.concurrent.atomic.AtomicReference
 
-class EventListener {
+class EventListener() {
 	var value = AtomicReference("")
 	private val triggerFunctions = mutableListOf<Event>()
 

@@ -10,6 +10,7 @@ import com.google.gson.Gson
 import com.google.gson.JsonObject
 import com.google.gson.internal.LinkedTreeMap
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode
+import com.qualcomm.robotcore.util.ElapsedTime
 import com.qualcomm.robotcore.util.RobotLog
 
 class CommandExecute(val opMode: LinearOpMode, val eventListener: EventListener, val testOnly: Boolean = false) {
@@ -52,6 +53,8 @@ class CommandExecute(val opMode: LinearOpMode, val eventListener: EventListener,
 							"spline" -> handleSpline(gsonParse.fromJson(command[name].toString(), ArrayList<LinkedTreeMap<String, JsonObject>>()::class.java))
 
 							"wait" -> handleWait(gsonParse.fromJson(command[name].toString(), Wait::class.java))
+
+							"block" -> handleBlock(gsonParse.fromJson(command[name].toString(), ArrayList<LinkedTreeMap<String, JsonObject>>()::class.java))
 						}
 					}
 					opMode.sleep(1000)
@@ -95,23 +98,35 @@ class CommandExecute(val opMode: LinearOpMode, val eventListener: EventListener,
 		val waitType = gsonParse.fromJson(wait.wait_type.toString(), LinkedTreeMap<String, JsonObject>()::class.java)
 
 		waitType.keys.forEach { waitName ->
+			val currentPosition = odometry?.getLocation()
+				movement?.target = currentPosition!!
 			when (waitName.lowercase()) {
 				"event" -> {
 					if (!testOnly) {
 						val eventData = gsonParse.fromJson(waitType[waitName].toString(), EventCall::class.java)
 						var event = ""
-						while (event !== eventData.message) {
+						while (opMode.opModeIsActive() && event !== eventData.message) {
+							movement?.goToPosition(currentPosition)
 							if (eventListener.value.get().lowercase() ==  eventData.message.lowercase()) {
 								event = eventData.message
 							}
 						}
 					} else {
-						opMode.sleep(2000)
+						val timer = ElapsedTime()
+						timer.reset()
+						val eventData = gsonParse.fromJson(waitType[waitName].toString(), Int::class.java)
+						while (opMode.opModeIsActive() && timer.milliseconds() < eventData.toLong()) {
+							movement?.goToPosition(currentPosition)
+						}
 					}
 				}
 				"time" -> {
+					val timer = ElapsedTime()
+					timer.reset()
 					val eventData = gsonParse.fromJson(waitType[waitName].toString(), Int::class.java)
-					opMode.sleep(eventData.toLong())
+					while (opMode.opModeIsActive() && timer.milliseconds() < eventData.toLong()) {
+						movement?.goToPosition(currentPosition)
+					}
 				}
 			}
 		}
@@ -138,6 +153,22 @@ class CommandExecute(val opMode: LinearOpMode, val eventListener: EventListener,
 
 		val points = commandsParse.bezier(bezier.start, bezier.control[0], bezier.control[1], bezier.end)
 		movement?.start(points)
+	}
+
+	private fun handleBlock(block: ArrayList<LinkedTreeMap<String, JsonObject>>) {
+		if (!opMode.opModeIsActive()) {
+			return
+		}
+		val listOfPoints = mutableListOf<Point>()
+		for (events in block) {
+			events.keys.forEach { event ->
+				when (event.lowercase()) {
+					"line" ->  listOfPoints.add(gsonParse.fromJson(events[event].toString(), Point::class.java))
+				}
+			}
+		}
+
+		movement?.start(listOfPoints)
 	}
 
 }

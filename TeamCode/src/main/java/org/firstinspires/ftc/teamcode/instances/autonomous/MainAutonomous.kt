@@ -16,13 +16,27 @@ class MainAutonomous(private val instance: LinearOpMode, listener: EventListener
 	val motors = Motors(bot.fl, bot.fr, bot.bl, bot.br)
 	init {
 		odometry.setConstants(OdometryValues.distanceBack, OdometryValues.distanceLeftRight)
-		listener.Subscribe(OutTakePixels())
+		listener.Subscribe(OutTakePixels(odometry))
+		listener.Subscribe(SlowDownMovement(motors))
+		listener.Subscribe(NormalizeMovement(motors))
 
 	}
 
-	class OutTakePixels: Event("Outtake_Pixels") {
+	class OutTakePixels(private val odometry: Odometry): Event("Outtake_Pixels") {
 		override suspend fun run() {
 			listener.call("Purple_outtake")
+		}
+	}
+
+	class SlowDownMovement(private val motors: Motors): Event("Slow_Down_Movement") {
+		override suspend fun run() {
+			motors.powerRatio.set(0.5)
+		}
+	}
+
+	class NormalizeMovement(private val motors: Motors): Event("Normalize_Movement") {
+		override suspend fun run() {
+			motors.powerRatio.set(1.0)
 		}
 	}
 }
