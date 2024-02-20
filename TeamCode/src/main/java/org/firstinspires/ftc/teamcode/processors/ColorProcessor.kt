@@ -13,7 +13,7 @@ import org.opencv.core.Scalar
 import org.opencv.core.Size
 import org.opencv.imgproc.Imgproc
 
-class ColorProcessor(private val alliance: ALLIANCE, private val optimized: Boolean = true): VisionProcessor {
+class ColorProcessor(var alliance: ALLIANCE, private val optimized: Boolean = true): VisionProcessor {
 
 	val center = Point()
 	var position = Position.NONE

@@ -35,8 +35,9 @@ class Camera(private val hardware: HardwareMap, private val optimized: Boolean =
 		return processor.build()
 	}
 
-	fun addProcessor(processor: VisionProcessor) {
+	fun addProcessor(processor: VisionProcessor): Camera {
 		builder.addProcessor(processor)
+		return this
 	}
 
 	fun build(): VisionPortal {

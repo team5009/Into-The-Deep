@@ -7,15 +7,14 @@ import ca.helios5009.hyperion.core.CommandExecute
 import ca.helios5009.hyperion.core.Movement
 import ca.helios5009.hyperion.misc.events.EventListener
 import com.acmerobotics.dashboard.FtcDashboard
-import com.acmerobotics.dashboard.config.Config
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode
+import com.qualcomm.robotcore.util.ElapsedTime
 import org.firstinspires.ftc.teamcode.instances.autonomous.MainAutonomous
+import org.firstinspires.ftc.teamcode.misc.ALLIANCE
 import org.firstinspires.ftc.teamcode.misc.MenuPathSelector
-import org.firstinspires.ftc.teamcode.processors.BlueColorProcessor
 import org.firstinspires.ftc.teamcode.processors.ColorProcessor
-import org.firstinspires.ftc.teamcode.processors.RedColorProcessor
 
 @Autonomous(name = "Main", group = "_Production")
 class MainAuto: LinearOpMode() {
@@ -24,9 +23,11 @@ class MainAuto: LinearOpMode() {
 		val autonPaths = AutonPaths()
 		val instance = MainAutonomous(this, listener)
 		val dash = FtcDashboard.getInstance()
-		val Menu = MenuPathSelector()
-		var cam: Camera? = null
-		var camProcess: ColorProcessor? = null
+		val menu = MenuPathSelector()
+		val camProcessor = ColorProcessor(ALLIANCE.BLUE)
+		val cam = Camera(hardwareMap).addProcessor(camProcessor).build()
+		val positionChangeTimer = ElapsedTime()
+
 		var position = Position.NONE
 		telemetry = MultipleTelemetry(telemetry, dash.telemetry)
 		val pathExecutor = CommandExecute(this, listener)
@@ -42,21 +43,19 @@ class MainAuto: LinearOpMode() {
 		var cameraSetup = false
 
 		while (opModeInInit()) {
-			Menu.run(this)
-			if (Menu.ready && !cameraSetup) {
-				cam = Camera(hardwareMap)
-				camProcess = ColorProcessor(Menu.allianceOption)
-				cam.addProcessor(camProcess)
-				cam.build()
+			menu.run(this)
+			if (menu.ready && !cameraSetup) {
+				camProcessor.alliance = menu.allianceOption
 				cameraSetup = true
-			} else if (!Menu.ready && cameraSetup) {
+			} else if (!menu.ready && cameraSetup) {
 				cameraSetup = false
-				cam = null
-				camProcess = null
 			}
 
 			if (cameraSetup) {
-				position = camProcess!!.position
+				if (camProcessor.position != position) {
+
+				}
+				position = camProcessor.position
 			}
 			val storedPaths = autonPaths.getAllPaths()
 		}

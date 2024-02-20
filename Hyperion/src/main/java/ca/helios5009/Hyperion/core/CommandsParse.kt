@@ -1,15 +1,19 @@
 package ca.helios5009.hyperion.core
 
+import android.annotation.SuppressLint
+import ca.helios5009.hyperion.misc.FileReader
 import ca.helios5009.hyperion.misc.commands.Point
 import ca.helios5009.hyperion.misc.cubicBezier
 import ca.helios5009.hyperion.misc.lerp
 import com.qualcomm.robotcore.util.RobotLog
 import kotlin.math.pow
 
+@SuppressLint("UnsafeDynamicallyLoadedCode")
 class CommandsParse {
 	init {
 		RobotLog.vv("Hyperion", "Loading Hyperion Library")
-		System.loadLibrary("hyperion")
+		val library = FileReader().getFile("libhyperion.so")
+		System.load(library)
 	}
 
 	external fun read(commands: String): String

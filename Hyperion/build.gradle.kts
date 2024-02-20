@@ -33,7 +33,7 @@ android {
 	extensions.configure(CargoExtension::class.java) {
 		module = "./src/main/rust"
 		libname = "hyperion"
-		targets = listOf("arm","arm64")
+		targets = listOf("arm")
 	}
 
 	tasks.preBuild.configure {
