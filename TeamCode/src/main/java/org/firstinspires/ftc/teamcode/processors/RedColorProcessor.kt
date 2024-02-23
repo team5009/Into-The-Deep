@@ -1,7 +1,7 @@
 package org.firstinspires.ftc.teamcode.processors
 
 import android.graphics.Canvas
-import ca.helios5009.Hyperion.misc.Position
+import ca.helios5009.hyperion.misc.Position
 import org.firstinspires.ftc.robotcore.internal.camera.calibration.CameraCalibration
 import org.firstinspires.ftc.vision.VisionProcessor
 import org.opencv.core.Core

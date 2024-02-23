@@ -1,9 +1,9 @@
 package org.firstinspires.ftc.teamcode.processors
 
 import android.graphics.Canvas
-import ca.helios5009.Hyperion.misc.Position
+import ca.helios5009.hyperion.misc.Alliance
+import ca.helios5009.hyperion.misc.Position
 import org.firstinspires.ftc.robotcore.internal.camera.calibration.CameraCalibration
-import org.firstinspires.ftc.teamcode.misc.ALLIANCE
 import org.firstinspires.ftc.vision.VisionProcessor
 import org.opencv.core.Core
 import org.opencv.core.Mat
@@ -13,7 +13,7 @@ import org.opencv.core.Scalar
 import org.opencv.core.Size
 import org.opencv.imgproc.Imgproc
 
-class ColorProcessor(var alliance: ALLIANCE, private val optimized: Boolean = true): VisionProcessor {
+class ColorProcessor(var alliance: Alliance, private val optimized: Boolean = true): VisionProcessor {
 
 	val center = Point()
 	var position = Position.NONE
@@ -30,12 +30,12 @@ class ColorProcessor(var alliance: ALLIANCE, private val optimized: Boolean = tr
 
 		val thresh = Mat()
 		val lowHSV = when(alliance) {
-			ALLIANCE.RED -> Scalar(100.0, 90.0, 100.0)
-			ALLIANCE.BLUE -> Scalar(0.0, 10.0, 0.0)
+			Alliance.RED -> Scalar(100.0, 90.0, 100.0)
+			Alliance.BLUE -> Scalar(0.0, 10.0, 0.0)
 		}
 		val highHSV = when(alliance) {
-			ALLIANCE.RED -> Scalar(140.0, 255.0, 255.0)
-			ALLIANCE.BLUE -> Scalar(140.0, 255.0, 255.0)
+			Alliance.RED -> Scalar(140.0, 255.0, 255.0)
+			Alliance.BLUE -> Scalar(140.0, 255.0, 255.0)
 		}
 
 

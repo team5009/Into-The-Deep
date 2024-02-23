@@ -27,13 +27,16 @@ android {
 				getDefaultProguardFile("proguard-android-optimize.txt"),
 				"proguard-rules.pro"
 			)
+			ndk {
+				abiFilters.addAll(listOf("armeabi-v7a", "arm64-v8a"))
+			}
 		}
 	}
 
 	extensions.configure(CargoExtension::class.java) {
 		module = "./src/main/rust"
 		libname = "hyperion"
-		targets = listOf("arm")
+		targets = listOf("arm", "arm64")
 	}
 
 	tasks.preBuild.configure {
@@ -48,6 +51,7 @@ android {
 	}
 
 	ndkVersion = "26.2.11394342"
+
 }
 
 dependencies {
@@ -58,7 +62,7 @@ dependencies {
 
 	implementation("androidx.core:core-ktx:1.5.0")
 	implementation(platform("org.jetbrains.kotlin:kotlin-bom:1.6.10"))
-	implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3")
+	implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.3.9")
 }
 
 project.afterEvaluate{

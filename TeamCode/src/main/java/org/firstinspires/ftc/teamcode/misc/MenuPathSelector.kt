@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.misc
 
+import ca.helios5009.hyperion.misc.Alliance
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode
 
 class MenuPathSelector {
@@ -12,10 +13,10 @@ class MenuPathSelector {
 	private var selectedAlliance = 0
 	private var selectedSide = 0
 
-	private val allianceOptions = arrayOf(ALLIANCE.RED, ALLIANCE.BLUE)
+	private val allianceOptions = arrayOf(Alliance.RED, Alliance.BLUE)
 	private val sideOptions = arrayOf(SIDE.LEFT, SIDE.RIGHT)
 
-	var allianceOption = ALLIANCE.RED
+	var allianceOption = Alliance.RED
 	var sideOption = SIDE.LEFT
 	var ready = false
 	fun run(instance: LinearOpMode) {
@@ -84,6 +85,7 @@ class MenuPathSelector {
 					currentPage = MENU_PAGE.CONFIRM
 					sideOption = sideOptions[selectedSide]
 					gamepadAPressed = true
+					ready = true
 
 				} else if (!g1.a && gamepadAPressed) {
 					gamepadAPressed = false
@@ -97,8 +99,7 @@ class MenuPathSelector {
 				}
 			}
 			MENU_PAGE.CONFIRM -> {
-				t.addData("Alliance", allianceOption)
-				t.addData("Side", sideOption)
+
 
 				if (g1.b && !gamepadBPressed) {
 					currentPage = MENU_PAGE.SIDE_SELECT
@@ -116,10 +117,6 @@ enum class MENU_PAGE {
 	ALLIANCE_SELECT,
 	SIDE_SELECT,
 	CONFIRM
-}
-
-enum class ALLIANCE {
-	RED, BLUE
 }
 
 enum class SIDE {
