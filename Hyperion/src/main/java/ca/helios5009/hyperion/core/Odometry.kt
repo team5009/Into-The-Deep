@@ -36,7 +36,7 @@ class Odometry (private val leftEncoder: DcMotorEx, private val rightEncoder: Dc
 		lastRight = currentRight
 
 		currentLeft = leftEncoder.currentPosition.toDouble()
-		currentRight = rightEncoder.currentPosition.toDouble()
+		currentRight = -rightEncoder.currentPosition.toDouble()
 		currentBack = backEncoder.currentPosition.toDouble()
 
 		val deltaLeft = currentLeft - lastLeft
@@ -49,9 +49,9 @@ class Odometry (private val leftEncoder: DcMotorEx, private val rightEncoder: Dc
 
 		val current = location.get()
 		val theta = current.rot + deltaTheta
-		current.x += deltaX * cos(theta) + deltaY * sin(theta)
+		current.x -= deltaX * cos(theta) + deltaY * sin(theta)
 		current.y += deltaX * sin(theta) - deltaY * cos(theta)
-		current.rot += deltaTheta
+		current.rot -= deltaTheta
 		location.set(current)
 
 		return true

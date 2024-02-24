@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode
 
+import com.acmerobotics.dashboard.config.Config
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode
 import com.qualcomm.robotcore.hardware.DcMotor
 import com.qualcomm.robotcore.hardware.DcMotorEx
@@ -13,10 +14,9 @@ class Robot(private val instance : LinearOpMode) {
 	val br: DcMotorEx = instance.hardwareMap.get(DcMotorEx::class.java, "BR")
 	val bl: DcMotorEx = instance.hardwareMap.get(DcMotorEx::class.java, "BL")
 
-	val leftEncoder: DcMotorEx = instance.hardwareMap.get(DcMotorEx::class.java, "felix")
-	val rightEncoder: DcMotorEx = instance.hardwareMap.get(DcMotorEx::class.java, "BL")
+	val rightEncoder: DcMotorEx = instance.hardwareMap.get(DcMotorEx::class.java, "LIFT")
+	val leftEncoder: DcMotorEx = instance.hardwareMap.get(DcMotorEx::class.java, "BL")
 	val backEncoder: DcMotorEx = instance.hardwareMap.get(DcMotorEx::class.java, "FL")
-
 	init {
 		fl.direction = DcMotorSimple.Direction.REVERSE
 		fr.direction = DcMotorSimple.Direction.FORWARD
@@ -44,4 +44,9 @@ class Robot(private val instance : LinearOpMode) {
 
 	}
 
+}
+@Config
+object OdometryValues {
+	@JvmField var distanceBack = -6.25;
+	@JvmField var distanceLeftRight = 11.5652;
 }

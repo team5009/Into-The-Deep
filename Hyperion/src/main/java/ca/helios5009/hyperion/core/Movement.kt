@@ -52,17 +52,17 @@ class Movement(private val listener: EventListener, private val bot: Motors, pri
 
 			val speedFactor = euclideanDistance(odometry.getLocation(), target)
 
-			val deltaX = (nextPoint.x - odometry.getLocation().x) / magnitude * speedFactor
-			val deltaY = nextPoint.y - odometry.getLocation().y / magnitude * speedFactor
-			val deltaRot = nextPoint.rot - odometry.getLocation().rot
+			val deltaX = -(nextPoint.x - odometry.getLocation().x) / magnitude * speedFactor
+			val deltaY = (nextPoint.y - odometry.getLocation().y) / magnitude * speedFactor
+			val deltaRot = -(nextPoint.rot - odometry.getLocation().rot)
 
 			val theta = -odometry.getLocation().rot
 			val dx = deltaX * cos(theta) - deltaY * sin(theta)
-			val dy = deltaX * sin(theta) + deltaY * cos(theta)
+			val dy =  deltaX * sin(theta) + deltaY * cos(theta)
 
 			val drive = driveController.getOutput(dx)
 			val strafe = strafeController.getOutput(dy)
-			val rotate = -rotateController.getOutput(deltaRot * 180/PI)
+			val rotate = rotateController.getOutput(deltaRot * 180/PI)
 			val diffDistance = atan2(dy, dx)
 
 //			if (t != null) {
@@ -72,26 +72,26 @@ class Movement(private val listener: EventListener, private val bot: Motors, pri
 ////				t.addLine("-----------------------------------------------")
 ////				t.addData("Next", "${nextPoint.x}, ${nextPoint.y}")
 ////				t.addData("Target", "${target.x}, ${target.y}")
-////				t.addData("Current", "${odometry.location.x}, ${odometry.location.y}")
-////				t.addData("Bigger?", isBigger)
-////				t.addData("Euclidean Difference", euclideanDistance(odometry.location, target) < euclideanDistance(nextPoint, target))
-////				t.addData("magnitude", magnitude)
-////				t.addData("current step", currentStep)
-////				t.addData("drive power", drive)
-////				t.addData("strafe power", strafe)
-////				t.addData("turn power", rotate)
-////				t.addData("Current X", odometry.location.x)
-////				t.addData("Current Y", odometry.location.y)
-////				t.addData("Next X", nextPoint.x)
-////				t.addData("Next Y", nextPoint.y)
-////				t.addData("Magnitude", magnitude)
-////				t.addData("Speed Factor", speedFactor)
-////				t.addData("X Error", dx)
-////				t.addData("Y Error", dy)
-////				t.addData("Distance X", deltaX)
-////				t.addData("Distance Y", deltaY)
-////				t.addData("Rot Error", deltaRot)
-////				t.update()
+				opMode.telemetry.addData("Current", "${odometry.getLocation().x}, ${odometry.getLocation().y}")
+//				t.addData("Bigger?", isBigger)
+//				t.addData("Euclidean Difference", euclideanDistance(odometry.location, target) < euclideanDistance(nextPoint, target))
+//				t.addData("magnitude", magnitude)
+//				t.addData("current step", currentStep)
+//				t.addData("drive power", drive)
+//				t.addData("strafe power", strafe)
+//				t.addData("turn power", rotate)
+//				t.addData("Current X", odometry.location.x)
+//				t.addData("Current Y", odometry.location.y)
+				opMode.telemetry.addData("Next X", nextPoint.x)
+				opMode.telemetry.addData("Next Y", nextPoint.y)
+//				t.addData("Magnitude", magnitude)
+//				t.addData("Speed Factor", speedFactor)
+				opMode.telemetry.addData("X Error", dx)
+				opMode.telemetry.addData("Y Error", dy)
+				opMode.telemetry.addData("Distance X", deltaX)
+				opMode.telemetry.addData("Distance Y", deltaY)
+//				t.addData("Rot Error", deltaRot)
+				opMode.telemetry.update()
 //			}
 
 			bot.move(drive, strafe, rotate)

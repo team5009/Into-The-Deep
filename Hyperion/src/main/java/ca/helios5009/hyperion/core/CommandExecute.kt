@@ -168,6 +168,11 @@ class CommandExecute(val opMode: LinearOpMode, val eventListener: EventListener,
 			}
 		}
 
+		for (line in listOfPoints) {
+			println(
+				"Point: ${line.x}, ${line.y}, ${line.rot}"
+			)
+		}
 		movement?.start(listOfPoints)
 	}
 

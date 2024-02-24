@@ -6,6 +6,7 @@ import ca.helios5009.hyperion.misc.events.Event
 import ca.helios5009.hyperion.misc.events.EventListener
 import com.acmerobotics.dashboard.config.Config
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode
+import org.firstinspires.ftc.teamcode.OdometryValues
 import org.firstinspires.ftc.teamcode.Robot
 import org.firstinspires.ftc.teamcode.autonomous.listener
 
@@ -14,6 +15,7 @@ class MainAutonomous(private val instance: LinearOpMode, listener: EventListener
 	val odometry = Odometry(bot.leftEncoder, bot.rightEncoder, bot.backEncoder)
 
 	val motors = Motors(bot.fl, bot.fr, bot.bl, bot.br)
+
 	init {
 		odometry.setConstants(OdometryValues.distanceBack, OdometryValues.distanceLeftRight)
 		listener.Subscribe(OutTakePixels(odometry))
@@ -22,27 +24,21 @@ class MainAutonomous(private val instance: LinearOpMode, listener: EventListener
 
 	}
 
-	class OutTakePixels(private val odometry: Odometry): Event("Outtake_Pixels") {
+	class OutTakePixels(private val odometry: Odometry) : Event("Outtake_Pixels") {
 		override suspend fun run() {
 			listener.call("Purple_outtake")
 		}
 	}
 
-	class SlowDownMovement(private val motors: Motors): Event("Slow_Down_Movement") {
+	class SlowDownMovement(private val motors: Motors) : Event("Slow_Down_Movement") {
 		override suspend fun run() {
 			motors.powerRatio.set(0.5)
 		}
 	}
 
-	class NormalizeMovement(private val motors: Motors): Event("Normalize_Movement") {
+	class NormalizeMovement(private val motors: Motors) : Event("Normalize_Movement") {
 		override suspend fun run() {
 			motors.powerRatio.set(1.0)
 		}
 	}
-}
-
-@Config
-object OdometryValues {
-	@JvmField var distanceBack = 6.25;
-	@JvmField var distanceLeftRight = 11.5652;
 }
