@@ -44,7 +44,6 @@ class BlueRight: LinearOpMode() {
 			path.end(EventCall("done"))
 		}
 	}
-	}
 
 	class OutTakePixel(): Event("Purple_outtake") {
 		override suspend fun run() {
