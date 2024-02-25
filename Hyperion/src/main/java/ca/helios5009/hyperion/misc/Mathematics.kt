@@ -15,3 +15,31 @@ fun cubicBezier(p0: Double, p1: Double, p2: Double, p3: Double, t: Double): Doub
 fun lerp(p0: Double, p1: Double, t: Double): Double {
 	return p0 + t * (p1 - p0)
 }
+
+fun generateBezier(pt0: Point, ct0: Point, ct1: Point, pt1: Point): MutableList<Point> {
+	val points = mutableListOf<Point>()
+	val resolution = 20
+
+	for (i in 0..resolution) {
+		val t = i.toDouble() / resolution
+
+		val x = cubicBezier(pt0.x, ct0.x, ct1.x, pt1.x, t)
+
+		val y = cubicBezier(pt0.y, ct0.y, ct1.y, pt1.y, t)
+
+		val rot = if (lerp(pt0.rot, pt1.rot, t) > 0)
+			lerp(pt0.rot, pt1.rot, t)
+		else
+			lerp(pt0.rot, pt1.rot, t) + 360
+
+		when(t) {
+			0.0 -> points.add(Point(x, y, 0.0, pt0.event))
+			1.0 -> points.add(Point(x, y, 0.0, pt1.event))
+			0.25 -> points.add(Point(x, y, 0.0, ct0.event))
+			0.75 -> points.add(Point(x, y, 0.0, ct1.event))
+			else -> points.add(Point(x, y, 0.0))
+		}
+	}
+
+	return points
+}

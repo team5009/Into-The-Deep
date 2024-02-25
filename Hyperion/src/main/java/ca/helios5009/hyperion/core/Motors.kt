@@ -17,4 +17,11 @@ class Motors(val fl: DcMotorEx, val fr: DcMotorEx, val br: DcMotorEx, val bl: Dc
 		bl.power = (drive - strafe - rotate) / max
 		br.power = (drive + strafe + rotate) / max
 	}
+
+	fun stop () {
+		fl.power = 0.0
+		fr.power = 0.0
+		bl.power = 0.0
+		br.power = 0.0
+	}
 }

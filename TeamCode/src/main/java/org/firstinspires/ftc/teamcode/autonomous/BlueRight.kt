@@ -2,9 +2,13 @@ package org.firstinspires.ftc.teamcode.autonomous
 
 import ca.helios5009.hyperion.misc.events.Event
 import ca.helios5009.hyperion.core.CommandExecute
+import ca.helios5009.hyperion.core.HyperionPath
 import ca.helios5009.hyperion.core.Motors
 import ca.helios5009.hyperion.core.Movement
 import ca.helios5009.hyperion.core.Odometry
+import ca.helios5009.hyperion.misc.commands.EventCall
+import ca.helios5009.hyperion.misc.commands.Line
+import ca.helios5009.hyperion.misc.commands.Point
 import ca.helios5009.hyperion.misc.events.EventListener
 import com.acmerobotics.dashboard.FtcDashboard
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry
@@ -19,11 +23,9 @@ class BlueRight: LinearOpMode() {
 	override fun runOpMode() {
 		val bot = Robot(this)
 		telemetry = MultipleTelemetry(telemetry, FtcDashboard.getInstance().telemetry)
-		val pathExecutor = CommandExecute(this, listener)
-		pathExecutor.readPath("blueLeft")
-		pathExecutor.motors = Motors( bot.fl, bot.fr, bot.bl, bot.br )
-		pathExecutor.odometry = Odometry(bot.leftEncoder, bot.rightEncoder, bot.backEncoder)
-		pathExecutor.movement = Movement(listener, pathExecutor.motors!!, pathExecutor.odometry!!, this)
+		val path = HyperionPath(this, listener)
+		path.odometry = Odometry(bot.leftEncoder, bot.rightEncoder, bot.backEncoder)
+		path.movement = Movement(listener, Motors( bot.fl, bot.fr, bot.bl, bot.br ), path.odometry!!, this)
 
 		listener.Subscribe(OutTakePixel())
 		listener.Subscribe(ScoreYellowPixel())
@@ -31,8 +33,17 @@ class BlueRight: LinearOpMode() {
 		listener.Subscribe(OutTakePixels())
 		waitForStart()
 		if (opModeIsActive()) {
-			pathExecutor.execute()
+			path.start(Point(59.0, -13.0, 180.0))
+			path.continuousLine(
+				listOf(
+					Point(20.0, -13.0, -150.0),
+					Point(35.0, -35.0, 135.0),
+					Point(34.0, -55.0, 80.0, EventCall("Yellow_Outtake")),
+				)
+			)
+			path.end(EventCall("done"))
 		}
+	}
 	}
 
 	class OutTakePixel(): Event("Purple_outtake") {
