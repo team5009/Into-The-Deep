@@ -47,6 +47,6 @@ class Robot(private val instance : LinearOpMode) {
 }
 @Config
 object OdometryValues {
-	@JvmField var distanceBack = -6.25;
+	@JvmField var distanceBack = -5.25;
 	@JvmField var distanceLeftRight = 11.5652;
 }

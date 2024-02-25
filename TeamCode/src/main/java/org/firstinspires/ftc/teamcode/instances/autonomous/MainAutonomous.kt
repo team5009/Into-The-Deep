@@ -24,9 +24,9 @@ class MainAutonomous(private val instance: LinearOpMode, listener: EventListener
 
 	}
 
-	class OutTakePixels(private val odometry: Odometry) : Event("Outtake_Pixels") {
+	class OutTakePixels(private val odometry: Odometry) : Event("YELLOW_PIXEL") {
 		override suspend fun run() {
-			listener.call("Purple_outtake")
+			listener.call("YELLOW_PIXEL_FINISH")
 		}
 	}
 
