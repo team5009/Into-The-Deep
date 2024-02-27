@@ -2,6 +2,8 @@ package ca.helios5009.hyperion.misc.events
 
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
 import java.util.concurrent.atomic.AtomicReference
 
@@ -19,10 +21,10 @@ class EventListener() {
 			if (it.event.lowercase() == newValue) {
 				CoroutineScope(Dispatchers.Default).launch {
 					it.run()
+					return@launch
 				}
 			}
 		}
 	}
 
 }
-
