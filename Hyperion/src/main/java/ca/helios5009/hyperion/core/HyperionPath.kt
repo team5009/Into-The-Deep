@@ -44,14 +44,9 @@ class HyperionPath(private val opMode: LinearOpMode, private val listener: Event
 	}
 
 	fun wait(message: String, event: EventCall) {
-		listener.call(message)
+		listener.call(event.message)
 		val currentPosition = odometry!!.getLocation()
-		val timer = ElapsedTime()
-		var tempVar = ""
-		while(opMode.opModeIsActive() && tempVar != message) {
-			if (listener.value.get() == message) {
-				tempVar = message
-			}
+		while(opMode.opModeIsActive() && !listener.isInQueue(message)) {
 			movement?.goToPosition(currentPosition)
 		}
 	}

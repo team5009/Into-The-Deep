@@ -20,7 +20,9 @@ import org.firstinspires.ftc.teamcode.Robot
 val listener = EventListener()
 @Autonomous(name = "Blue Right", group = "Autonomous")
 class BlueRight: LinearOpMode() {
+	val forward = Point(0.0, 1.0, 0.0)
 	override fun runOpMode() {
+		forward.useError()
 		val bot = Robot(this)
 		telemetry = MultipleTelemetry(telemetry, FtcDashboard.getInstance().telemetry)
 		val path = HyperionPath(this, listener)
@@ -36,12 +38,17 @@ class BlueRight: LinearOpMode() {
 			path.start(Point(59.0, -13.0, 180.0))
 			path.continuousLine(
 				listOf(
-					Point(20.0, -13.0, -150.0),
+					Point(20.0, -13.0, -150.0).useError().setLocal(),
 					Point(35.0, -35.0, 135.0),
 					Point(34.0, -55.0, 80.0, EventCall("Yellow_Outtake")),
 				)
 			)
 			path.end(EventCall("done"))
+		}
+
+		if(isStopRequested) {
+			listener.clearQueue()
+			listener.clearScopes()
 		}
 	}
 

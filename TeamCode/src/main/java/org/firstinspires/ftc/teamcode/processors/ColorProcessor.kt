@@ -18,44 +18,45 @@ class ColorProcessor(var alliance: Alliance, private val optimized: Boolean = tr
 	val center = Point()
 	var position = Position.NONE
 	override fun init(width: Int, height: Int, calibration: CameraCalibration?) {
-		TODO("Not yet implemented")
+		return
 	}
 
 	override fun processFrame(frame: Mat, captureTimeNanos: Long): Any {
 		val contours = mutableListOf<MatOfPoint>()
-		Imgproc.cvtColor(frame, frame, Imgproc.COLOR_RGB2HSV)
-		if (frame.empty()) {
+		val mat = Mat()
+		Imgproc.cvtColor(frame, mat, Imgproc.COLOR_RGB2HSV)
+		if (mat.empty()) {
 			return frame
 		}
 
 		val thresh = Mat()
 		val lowHSV = when(alliance) {
-			Alliance.RED -> Scalar(100.0, 90.0, 100.0)
-			Alliance.BLUE -> Scalar(0.0, 10.0, 0.0)
+			Alliance.BLUE -> Scalar(100.0, 90.0, 100.0)
+			Alliance.RED -> Scalar(0.0, 10.0, 0.0)
 		}
 		val highHSV = when(alliance) {
-			Alliance.RED -> Scalar(140.0, 255.0, 255.0)
-			Alliance.BLUE -> Scalar(140.0, 255.0, 255.0)
+			Alliance.BLUE -> Scalar(130.0, 255.0, 200.0)
+			Alliance.RED -> Scalar(15.0, 255.0, 150.0)
 		}
 
 
-		Core.inRange(frame, lowHSV, highHSV, thresh)
+		Core.inRange(mat, lowHSV, highHSV, thresh)
 
 		if (thresh.empty()) {
 			return frame
 		}
 
 		val mask = Mat()
-		Core.bitwise_and(frame, frame, mask, thresh)
+		Core.bitwise_and(mat, mat, mask, thresh)
 
-		val avg = Core.mean(mask)
+		val avg = Core.mean(mask, thresh)
 
 		val scaledMask = Mat()
 		mask.convertTo(scaledMask, -1, 150/avg.`val`[1], 0.0)
 
 		val scaledThresh = Mat()
 		val strictLowHSV = Scalar(0.0, 100.0, 18.0)
-		val strictHighHSV = Scalar(255.0, 255.0, 200.0)
+		val strictHighHSV =Scalar(255.0, 255.0, 200.0)
 
 		Core.inRange(scaledMask, strictLowHSV, strictHighHSV, scaledThresh)
 
@@ -69,7 +70,7 @@ class ColorProcessor(var alliance: Alliance, private val optimized: Boolean = tr
 		Imgproc.findContours(cleanup, contours, contour, Imgproc.RETR_LIST, Imgproc.CHAIN_APPROX_SIMPLE)
 
 		val finalMask = Mat()
-		Core.bitwise_and(frame, frame, finalMask, cleanup)
+		Core.bitwise_and(mat, mat, finalMask, cleanup)
 
 		if (contours.isNotEmpty()) {
 			val biggest = contours.maxByOrNull { Imgproc.contourArea(it) }
@@ -103,6 +104,7 @@ class ColorProcessor(var alliance: Alliance, private val optimized: Boolean = tr
 			Position.RIGHT
 		}
 
+		mat.release()
 		thresh.release()
 		mask.release()
 		scaledMask.release()
@@ -123,6 +125,6 @@ class ColorProcessor(var alliance: Alliance, private val optimized: Boolean = tr
 		scaleCanvasDensity: Float,
 		userContext: Any?
 	) {
-		TODO("Not yet implemented")
+
 	}
 }

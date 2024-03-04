@@ -25,8 +25,9 @@ class MainAuto: LinearOpMode() {
 		val dash = FtcDashboard.getInstance()
 		telemetry = MultipleTelemetry(telemetry, dash.telemetry)
 		val menu = MenuPathSelector()
-		val camProcessor = ColorProcessor(Alliance.BLUE)
-//		val cam = Camera(hardwareMap).addProcessor(camProcessor).build()
+		val optimized = false
+		val camProcessor = ColorProcessor(Alliance.BLUE, optimized)
+		val cam = Camera(hardwareMap, optimized).addProcessor(camProcessor).build()
 		val positionChangeTimer = ElapsedTime()
 
 //		var position = Position.NONE

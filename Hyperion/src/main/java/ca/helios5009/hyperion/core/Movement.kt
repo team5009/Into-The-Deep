@@ -2,10 +2,10 @@ package ca.helios5009.hyperion.core
 
 import ca.helios5009.hyperion.misc.euclideanDistance
 import ca.helios5009.hyperion.misc.commands.Point
+import ca.helios5009.hyperion.misc.commands.PointType
 import ca.helios5009.hyperion.misc.events.EventListener
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode
 import com.qualcomm.robotcore.util.ElapsedTime
-import org.firstinspires.ftc.robotcore.external.Telemetry
 import kotlin.math.PI
 import kotlin.math.abs
 import kotlin.math.atan2
@@ -22,8 +22,26 @@ class Movement(private val listener: EventListener, private val bot: Motors, pri
 	fun start(points: MutableList<Point>) {
 		target = points.removeLast()
 		for (i in 0 until points.size) {
-			val point = points[i]
-			listener.call(point.event.message)
+			var point = points[i]
+
+			if (point.event.message.startsWith("constant_move")) { // "constant_move|90|nothing"
+				val split = point.event.message.split("|")
+				val angle = split[1].toDouble() * PI / 180.0
+				val message = split[2]
+				listener.call(message)
+				while(opMode.opModeIsActive() && odometry.calculate() && abs(odometry.getLocation().rot - angle) > 1.0) {
+					bot.move(point.x, point.y, point.rot)
+				}
+			} else {
+				listener.call(point.event.message)
+				if (point.type == PointType.Relative) {
+					val localX = odometry.getLocation().x + point.x
+					val localY = odometry.getLocation().y + point.y
+					val localRot = odometry.getLocation().rot + point.rot
+					point = Point(localX, localY, localRot)
+				}
+
+			}
 			val isBigger = euclideanDistance(odometry.getLocation(), target) < euclideanDistance(point, target)
 			goToPosition(point, isBigger)
 			resetController()
@@ -47,7 +65,11 @@ class Movement(private val listener: EventListener, private val bot: Motors, pri
 				break
 			}
 
-			val speedFactor = euclideanDistance(odometry.getLocation(), target)
+			val speedFactor = if (!nextPoint.useError) {
+				euclideanDistance(odometry.getLocation(), target)
+			} else {
+				euclideanDistance(odometry.getLocation(), nextPoint)
+			}
 
 			val deltaX = -(nextPoint.x - odometry.getLocation().x) / magnitude * speedFactor
 			val deltaY = nextPoint.y - odometry.getLocation().y / magnitude * speedFactor
@@ -60,8 +82,7 @@ class Movement(private val listener: EventListener, private val bot: Motors, pri
 			val drive = driveController.getOutput(dx)
 			val strafe = strafeController.getOutput(dy)
 			val rotate = rotateController.getOutput(deltaRot * 180/PI)
-			val diffDistance = atan2(dy, dx)
-
+			bot.move(drive, strafe, rotate)
 //			if (t != null) {
 ////				t.addData("drivePosition", driveController.inPosition)
 ////				t.addData("strafePosition", strafeController.inPosition)
@@ -90,9 +111,6 @@ class Movement(private val listener: EventListener, private val bot: Motors, pri
 ////				t.addData("Rot Error", deltaRot)
 ////				t.update()
 //			}
-
-			bot.move(drive, strafe, rotate)
-//			bot.move(diffDistance, drive, strafe, rotate * 0.2)
 			if (isBigger == null) {
 				break
 			}
@@ -102,6 +120,7 @@ class Movement(private val listener: EventListener, private val bot: Motors, pri
 	private fun goToEndPoint() {
 		val timer = ElapsedTime()
 		val timeout = ElapsedTime()
+		var inPosition = false
 		resetController()
 		while (opMode.opModeIsActive()) {
 			goToPosition(target)
@@ -110,11 +129,23 @@ class Movement(private val listener: EventListener, private val bot: Motors, pri
 				if (timer.seconds() > 0.15) {
 					break
 				}
-			} else if (timeout.milliseconds() > 1000.0) {
-				break
 			} else {
 				timer.reset()
 			}
+
+			if (driveController.inPosition() || strafeController.inPosition() || rotateController.inPosition()) {
+				if (!inPosition) {
+					timeout.reset()
+					inPosition = true
+				}
+				if (timeout.seconds() > 0.5) {
+					break
+				}
+			} else {
+				inPosition = false
+			}
+
+
 		}
 	}
 
